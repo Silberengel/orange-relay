@@ -356,42 +356,44 @@ class HomeScreen extends ConsumerWidget {
       context: context,
       builder: (context) => Container(
         padding: const EdgeInsets.all(16),
-        child: Column(
-          mainAxisSize: MainAxisSize.min,
-          children: [
-            const Text(
-              'Notifications',
-              style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
-            ),
-            const SizedBox(height: 16),
-            ListTile(
-              leading: const Icon(Icons.event, color: Colors.orange),
-              title: const Text('New events received'),
-              subtitle: const Text('5 new events in your feed'),
-              trailing: const Text('2m ago'),
-            ),
-            ListTile(
-              leading: const Icon(Icons.broadcast_on_personal, color: Colors.orange),
-              title: const Text('Broadcast completed'),
-              subtitle: const Text('Event published to 3 relays'),
-              trailing: const Text('5m ago'),
-            ),
-            ListTile(
-              leading: const Icon(Icons.book, color: Colors.orange),
-              title: const Text('New book available'),
-              subtitle: const Text('"Nostr Protocol Guide" by npub1...'),
-              trailing: const Text('1h ago'),
-            ),
-            const SizedBox(height: 16),
-            ElevatedButton(
-              onPressed: () => Navigator.of(context).pop(),
-              style: ElevatedButton.styleFrom(
-                backgroundColor: Colors.orange,
-                foregroundColor: Colors.white,
+        child: SingleChildScrollView(
+          child: Column(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              const Text(
+                'Notifications',
+                style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
               ),
-              child: const Text('Mark All as Read'),
-            ),
-          ],
+              const SizedBox(height: 16),
+              ListTile(
+                leading: const Icon(Icons.event, color: Colors.orange),
+                title: const Text('New events received'),
+                subtitle: const Text('5 new events in your feed'),
+                trailing: const Text('2m ago'),
+              ),
+              ListTile(
+                leading: const Icon(Icons.broadcast_on_personal, color: Colors.orange),
+                title: const Text('Broadcast completed'),
+                subtitle: const Text('Event published to 3 relays'),
+                trailing: const Text('5m ago'),
+              ),
+              ListTile(
+                leading: const Icon(Icons.book, color: Colors.orange),
+                title: const Text('New book available'),
+                subtitle: const Text('"Nostr Protocol Guide" by npub1...'),
+                trailing: const Text('1h ago'),
+              ),
+              const SizedBox(height: 16),
+              ElevatedButton(
+                onPressed: () => Navigator.of(context).pop(),
+                style: ElevatedButton.styleFrom(
+                  backgroundColor: Colors.orange,
+                  foregroundColor: Colors.white,
+                ),
+                child: const Text('Mark All as Read'),
+              ),
+            ],
+          ),
         ),
       ),
     );
