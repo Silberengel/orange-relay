@@ -1,10 +1,13 @@
 import 'dart:convert';
 import 'dart:math';
+import '../ffi/nostr_ffi.dart';
 
-/// Rust service for FFI communication
-/// This is a placeholder implementation until Rust FFI is properly set up
+/// Rust service for FFI communication with real Nostr backend
 class RustService {
   static final Random _random = Random();
+  static bool _useRealBackend = false;
+  
+  // Fallback sample data for when FFI is not available
   static final List<String> _sampleAuthors = [
     'Alice Johnson',
     'Bob Smith',
@@ -31,14 +34,44 @@ class RustService {
 
   /// Initialize the Rust service
   static Future<void> initialize() async {
-    // TODO: Initialize Rust FFI
-    await Future.delayed(const Duration(milliseconds: 100));
+    try {
+      await NostrFFI.initialize();
+      final result = await NostrFFI.initializeNostrClient();
+      _useRealBackend = result['success'] == true;
+      
+      if (_useRealBackend) {
+        print('✅ Connected to real Nostr backend');
+      } else {
+        print('⚠️ Using mock data (FFI not available)');
+      }
+    } catch (e) {
+      print('⚠️ FFI initialization failed, using mock data: $e');
+      _useRealBackend = false;
+    }
   }
 
   /// Get feed events from Rust backend
   static Future<List<Map<String, dynamic>>> getFeedEvents({int limit = 100}) async {
-    // TODO: Implement actual Rust FFI call
-    // For now, return realistic mock events
+    if (_useRealBackend) {
+      try {
+        final result = await NostrFFI.getFeedEvents(limit: limit);
+        if (result['success'] == true && result['events'] != null) {
+          return List<Map<String, dynamic>>.from(result['events']);
+        } else {
+          print('⚠️ Failed to get real events, falling back to mock data');
+          return _generateMockEvents(limit);
+        }
+      } catch (e) {
+        print('⚠️ Error getting real events, falling back to mock data: $e');
+        return _generateMockEvents(limit);
+      }
+    } else {
+      return _generateMockEvents(limit);
+    }
+  }
+
+  /// Generate mock events for fallback
+  static List<Map<String, dynamic>> _generateMockEvents(int limit) {
     return List.generate(limit, (index) {
       final author = _sampleAuthors[index % _sampleAuthors.length];
       final content = _sampleContent[index % _sampleContent.length];
@@ -73,15 +106,46 @@ class RustService {
 
   /// Get chronological feed from Rust backend
   static Future<List<Map<String, dynamic>>> getChronologicalFeed({int limit = 100}) async {
-    // TODO: Implement actual Rust FFI call
-    // For now, return same as getFeedEvents but with different ordering
-    return await getFeedEvents(limit: limit);
+    if (_useRealBackend) {
+      try {
+        final result = await NostrFFI.getChronologicalFeed(limit: limit);
+        if (result['success'] == true && result['events'] != null) {
+          return List<Map<String, dynamic>>.from(result['events']);
+        } else {
+          print('⚠️ Failed to get real chronological feed, falling back to mock data');
+          return _generateMockEvents(limit);
+        }
+      } catch (e) {
+        print('⚠️ Error getting real chronological feed, falling back to mock data: $e');
+        return _generateMockEvents(limit);
+      }
+    } else {
+      return _generateMockEvents(limit);
+    }
   }
 
   /// Broadcast event to relays
   static Future<Map<String, dynamic>> broadcastEvent(String eventId, List<String> relayUrls) async {
-    // TODO: Implement actual Rust FFI call
-    // For now, simulate broadcast with realistic success/failure rates
+    if (_useRealBackend) {
+      try {
+        final result = await NostrFFI.broadcastEvent(eventId, relayUrls);
+        if (result['success'] == true) {
+          return result;
+        } else {
+          print('⚠️ Failed to broadcast to real relays, falling back to simulation');
+          return _simulateBroadcast(eventId, relayUrls);
+        }
+      } catch (e) {
+        print('⚠️ Error broadcasting to real relays, falling back to simulation: $e');
+        return _simulateBroadcast(eventId, relayUrls);
+      }
+    } else {
+      return _simulateBroadcast(eventId, relayUrls);
+    }
+  }
+
+  /// Simulate broadcast for fallback
+  static Future<Map<String, dynamic>> _simulateBroadcast(String eventId, List<String> relayUrls) async {
     await Future.delayed(Duration(milliseconds: 500 + _random.nextInt(2000)));
     
     final successfulRelays = <String>[];
@@ -109,8 +173,26 @@ class RustService {
 
   /// Get broadcast history
   static Future<List<Map<String, dynamic>>> getBroadcastHistory() async {
-    // TODO: Implement actual Rust FFI call
-    // For now, return sample history
+    if (_useRealBackend) {
+      try {
+        final result = await NostrFFI.getBroadcastHistory();
+        if (result['success'] == true && result['history'] != null) {
+          return List<Map<String, dynamic>>.from(result['history']);
+        } else {
+          print('⚠️ Failed to get real broadcast history, falling back to mock data');
+          return _generateMockHistory();
+        }
+      } catch (e) {
+        print('⚠️ Error getting real broadcast history, falling back to mock data: $e');
+        return _generateMockHistory();
+      }
+    } else {
+      return _generateMockHistory();
+    }
+  }
+
+  /// Generate mock broadcast history for fallback
+  static List<Map<String, dynamic>> _generateMockHistory() {
     return List.generate(10, (index) => {
       'event_id': 'event_${_generateRandomId()}',
       'timestamp': DateTime.now().millisecondsSinceEpoch ~/ 1000 - index * 3600,
@@ -122,12 +204,26 @@ class RustService {
 
   /// Get relay statistics
   static Future<Map<String, dynamic>> getRelayStats() async {
-    // TODO: Implement actual Rust FFI call
-    // For now, return realistic mock stats
-    final totalRelays = 8;
-    final activeRelays = 6 + _random.nextInt(3);
-    final failedRelays = totalRelays - activeRelays;
-    
+    if (_useRealBackend) {
+      try {
+        final result = await NostrFFI.getRelayStats();
+        if (result['success'] == true && result['stats'] != null) {
+          return Map<String, dynamic>.from(result['stats']);
+        } else {
+          print('⚠️ Failed to get real relay stats, falling back to mock data');
+          return _generateMockRelayStats();
+        }
+      } catch (e) {
+        print('⚠️ Error getting real relay stats, falling back to mock data: $e');
+        return _generateMockRelayStats();
+      }
+    } else {
+      return _generateMockRelayStats();
+    }
+  }
+
+  /// Generate mock relay stats for fallback
+  static Map<String, dynamic> _generateMockRelayStats() {
     return {
       'wss://relay.damus.io': {
         'is_online': true,

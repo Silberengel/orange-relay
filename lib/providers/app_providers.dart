@@ -131,7 +131,7 @@ class SettingsNotifier extends StateNotifier<Map<String, dynamic>> {
     'notifications': true,
     'biometric_auth': false,
     'auto_broadcast': false,
-    'default_relays': <String>[],
+    'DEFAULT_READ_RELAYS': <String>[],
   });
 
   void updateSetting(String key, dynamic value) {
