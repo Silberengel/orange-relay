@@ -1,4 +1,4 @@
-package com.gitcitadel.alexnative.alex_native_mobile
+package com.gitcitadel.orange_relay
 
 import io.flutter.embedding.android.FlutterActivity
 

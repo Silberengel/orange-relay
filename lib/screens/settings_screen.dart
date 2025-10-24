@@ -401,13 +401,15 @@ class _SettingsScreenState extends ConsumerState<SettingsScreen> {
   void _showAboutDialog() {
     showAboutDialog(
       context: context,
-      applicationName: 'Alex Native',
+      applicationName: 'Orange Relay',
       applicationVersion: '1.0.0',
-      applicationIcon: const Icon(Icons.book, size: 48),
+      applicationIcon: const Icon(Icons.local_drink, size: 48, color: Colors.orange),
       children: [
         const Text('A high-performance Nostr relay with mobile interface.'),
         const SizedBox(height: 16),
         const Text('Built with Flutter and Rust for maximum performance.'),
+        const SizedBox(height: 16),
+        const Text('🍊 Inspired by the Citrine Relay, bringing the power of Nostr to mobile.'),
       ],
     );
   }

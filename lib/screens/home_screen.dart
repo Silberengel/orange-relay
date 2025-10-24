@@ -5,6 +5,7 @@ import '../providers/app_providers.dart';
 import '../widgets/event_card.dart';
 import '../widgets/book_card.dart';
 import '../widgets/quick_actions.dart';
+import '../widgets/orange_logo.dart';
 
 class HomeScreen extends ConsumerWidget {
   const HomeScreen({super.key});
@@ -16,7 +17,13 @@ class HomeScreen extends ConsumerWidget {
 
     return Scaffold(
       appBar: AppBar(
-        title: const Text('Alex Native'),
+        title: Row(
+          children: [
+            const OrangeLogoSmall(),
+            const SizedBox(width: 8),
+            const Text('Orange Relay'),
+          ],
+        ),
         actions: [
           IconButton(
             icon: const Icon(Icons.search),
@@ -79,11 +86,7 @@ class HomeScreen extends ConsumerWidget {
                         padding: EdgeInsets.all(32.0),
                         child: Column(
                           children: [
-                            Icon(
-                              Icons.timeline,
-                              size: 64,
-                              color: Colors.grey,
-                            ),
+                            const OrangeLogo(size: 64),
                             SizedBox(height: 16),
                             Text(
                               'No events yet',

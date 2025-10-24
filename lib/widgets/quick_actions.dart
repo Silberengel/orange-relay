@@ -81,7 +81,7 @@ class _ActionButton extends StatelessWidget {
             Icon(
               icon,
               size: 24,
-              color: Theme.of(context).colorScheme.primary,
+              color: Colors.orange,
             ),
             const SizedBox(height: 8),
             Text(

@@ -36,7 +36,7 @@ class AlexNativeApp extends ConsumerWidget {
     final router = ref.watch(routerProvider);
     
     return MaterialApp.router(
-      title: 'Alex Native',
+      title: 'Orange Relay',
       theme: AppTheme.lightTheme,
       darkTheme: AppTheme.darkTheme,
       themeMode: ThemeMode.system,
