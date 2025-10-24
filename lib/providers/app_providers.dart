@@ -34,6 +34,16 @@ class FeedNotifier extends StateNotifier<AsyncValue<List<FeedEvent>>> {
   Future<void> refresh() async {
     await loadFeed();
   }
+
+  Future<void> loadMore() async {
+    // Load more events for pagination
+    try {
+      // TODO: Implement actual pagination
+      await Future.delayed(const Duration(seconds: 1));
+    } catch (e, stackTrace) {
+      // Handle error silently for now
+    }
+  }
 }
 
 // Book provider
@@ -60,6 +70,23 @@ class BookNotifier extends StateNotifier<AsyncValue<BookStructure?>> {
       }
     } catch (e) {
       state = AsyncValue.error(e, StackTrace.current);
+    }
+  }
+
+  void setCurrentChapter(int chapterIndex) {
+    if (state.hasValue && state.value != null) {
+      final book = state.value!;
+      final updatedBook = BookStructure(
+        id: book.id,
+        title: book.title,
+        author: book.author,
+        description: book.description,
+        created_at: book.created_at,
+        chapters: book.chapters,
+        total_chapters: book.total_chapters,
+        current_chapter: chapterIndex,
+      );
+      state = AsyncValue.data(updatedBook);
     }
   }
 }
@@ -131,11 +158,10 @@ class BooksNotifier extends StateNotifier<AsyncValue<List<BookStructure>>> {
         title: 'Sample Book ${index + 1}',
         author: 'Author ${index + 1}',
         description: 'This is a sample book description for book ${index + 1}.',
-        coverUrl: null,
+        created_at: DateTime.now().millisecondsSinceEpoch ~/ 1000,
         chapters: [],
-        totalChapters: 0,
-        currentChapter: 0,
-        readingProgress: 0.0,
+        total_chapters: 0,
+        current_chapter: 0,
       ));
       state = AsyncValue.data(books);
     } catch (e, stackTrace) {
@@ -147,6 +173,7 @@ class BooksNotifier extends StateNotifier<AsyncValue<List<BookStructure>>> {
     await loadBooks();
   }
 }
+
 
 final routerProvider = Provider<GoRouter>((ref) {
   return GoRouter(

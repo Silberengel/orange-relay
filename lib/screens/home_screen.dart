@@ -206,7 +206,7 @@ class HomeScreen extends ConsumerWidget {
                 delegate: SliverChildBuilderDelegate(
                   (context, index) {
                     // Load books from the database
-                    ref.read(booksProvider.notifier).loadBooks(),
+                    ref.read(booksProvider.notifier).loadBooks();
                     return BookCard(
                       title: 'Sample Book ${index + 1}',
                       author: 'Author ${index + 1}',

@@ -45,7 +45,7 @@ class BookStructure {
 
   /// Get estimated reading time
   String get estimatedReadingTime {
-    final totalWords = chapters.fold<int>(0, (sum, chapter) => sum + chapter.wordCount);
+    final totalWords = chapters.fold<int>(0, (sum, chapter) => sum + chapter.word_count);
     final wordsPerMinute = 200; // Average reading speed
     final minutes = (totalWords / wordsPerMinute).ceil();
     
@@ -88,6 +88,9 @@ class Chapter {
     if (content.length <= 200) return content;
     return '${content.substring(0, 200)}...';
   }
+
+  /// Get chapter index (same as order)
+  int get index => order;
 
   /// Get reading time as string
   String get readingTimeString {

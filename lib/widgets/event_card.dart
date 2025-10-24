@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import '../models/feed_event.dart';
 
-class EventCard extends StatelessWidget {
+class EventCard extends StatefulWidget {
   final FeedEvent event;
   final VoidCallback? onReply;
   final VoidCallback? onBoost;
@@ -16,6 +16,11 @@ class EventCard extends StatelessWidget {
   });
 
   @override
+  State<EventCard> createState() => _EventCardState();
+}
+
+class _EventCardState extends State<EventCard> {
+  @override
   Widget build(BuildContext context) {
     return Card(
       elevation: 2,
@@ -29,11 +34,11 @@ class EventCard extends StatelessWidget {
               children: [
                 CircleAvatar(
                   radius: 20,
-                  backgroundImage: event.author_picture != null
-                      ? NetworkImage(event.author_picture!)
+                  backgroundImage: widget.event.author_picture != null
+                      ? NetworkImage(widget.event.author_picture!)
                       : null,
-                  child: event.author_picture == null
-                      ? Text(event.authorDisplayName.substring(0, 1).toUpperCase())
+                  child: widget.event.author_picture == null
+                      ? Text(widget.event.authorDisplayName.substring(0, 1).toUpperCase())
                       : null,
                 ),
                 const SizedBox(width: 12),
@@ -42,14 +47,14 @@ class EventCard extends StatelessWidget {
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
                       Text(
-                        event.authorDisplayName,
+                        widget.event.authorDisplayName,
                         style: const TextStyle(
                           fontWeight: FontWeight.bold,
                         ),
                       ),
-                      if (event.author_about != null)
+                      if (widget.event.author_about != null)
                         Text(
-                          event.author_about!,
+                          widget.event.author_about!,
                           style: TextStyle(
                             color: Colors.grey[600],
                             fontSize: 12,
@@ -61,7 +66,7 @@ class EventCard extends StatelessWidget {
                   ),
                 ),
                 Text(
-                  event.relativeTime,
+                  widget.event.relativeTime,
                   style: TextStyle(
                     color: Colors.grey[600],
                     fontSize: 12,
@@ -73,15 +78,15 @@ class EventCard extends StatelessWidget {
             const SizedBox(height: 12),
 
             // Event content
-            if (event.content.isNotEmpty)
+            if (widget.event.content.isNotEmpty)
               Text(
-                event.content,
+                widget.event.content,
                 style: const TextStyle(fontSize: 16),
               ),
 
             // Media content
-            if (event.hasMedia)
-              ...event.mediaUrls.map((url) => Padding(
+            if (widget.event.hasMedia)
+              ...widget.event.mediaUrls.map((url) => Padding(
                 padding: const EdgeInsets.only(top: 8.0),
                 child: ClipRRect(
                   borderRadius: BorderRadius.circular(8),
@@ -104,12 +109,12 @@ class EventCard extends StatelessWidget {
               )),
 
             // Hashtags
-            if (event.hashtags.isNotEmpty)
+            if (widget.event.hashtags.isNotEmpty)
               Padding(
                 padding: const EdgeInsets.only(top: 8.0),
                 child: Wrap(
                   spacing: 4,
-                  children: event.hashtags.map((tag) => Chip(
+                  children: widget.event.hashtags.map((tag) => Chip(
                     label: Text('#$tag'),
                     backgroundColor: Colors.blue.shade100,
                     labelStyle: TextStyle(
@@ -127,28 +132,28 @@ class EventCard extends StatelessWidget {
               children: [
                 IconButton(
                   icon: const Icon(Icons.reply),
-                  onPressed: onReply,
+                  onPressed: widget.onReply,
                   tooltip: 'Reply',
                 ),
-                Text('${event.reply_count}'),
+                Text('${widget.event.reply_count}'),
                 const SizedBox(width: 16),
                 IconButton(
                   icon: const Icon(Icons.repeat),
-                  onPressed: onBoost,
+                  onPressed: widget.onBoost,
                   tooltip: 'Boost',
                 ),
-                Text('${event.boost_count}'),
+                Text('${widget.event.boost_count}'),
                 const Spacer(),
                 IconButton(
                   icon: const Icon(Icons.broadcast_on_personal),
-                  onPressed: onBroadcast,
+                  onPressed: widget.onBroadcast,
                   tooltip: 'Broadcast',
                 ),
-                if (event.external_viewer_url != null)
+                if (widget.event.external_viewer_url != null)
                   IconButton(
                     icon: const Icon(Icons.open_in_new),
                     onPressed: () {
-                      _openExternalViewer(event.external_viewer_url!);
+                      _openExternalViewer(context, widget.event.external_viewer_url!);
                     },
                     tooltip: 'Open in external viewer',
                   ),
@@ -160,7 +165,7 @@ class EventCard extends StatelessWidget {
     );
   }
 
-  void _openExternalViewer(String url) {
+  void _openExternalViewer(BuildContext context, String url) {
     // Open external viewer URL
     showDialog(
       context: context,

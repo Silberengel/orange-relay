@@ -253,7 +253,7 @@ class _BookReaderScreenState extends ConsumerState<BookReaderScreen> {
 
   void _goToPreviousChapter() {
     final book = ref.read(bookProvider(widget.bookId).notifier).state.value;
-    if (book.current_chapter > 0) {
+    if (book?.current_chapter != null && book!.current_chapter > 0) {
       final previousChapter = book.chapters[book.current_chapter - 1];
       _navigateToChapter(previousChapter);
     }
@@ -261,7 +261,8 @@ class _BookReaderScreenState extends ConsumerState<BookReaderScreen> {
 
   void _goToNextChapter() {
     final book = ref.read(bookProvider(widget.bookId).notifier).state.value;
-    if (book.current_chapter < book.total_chapters - 1) {
+    if (book?.current_chapter != null && book?.total_chapters != null && 
+        book!.current_chapter < book.total_chapters - 1) {
       final nextChapter = book.chapters[book.current_chapter + 1];
       _navigateToChapter(nextChapter);
     }

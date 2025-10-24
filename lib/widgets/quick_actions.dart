@@ -1,9 +1,14 @@
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 
-class QuickActions extends StatelessWidget {
+class QuickActions extends StatefulWidget {
   const QuickActions({super.key});
 
+  @override
+  State<QuickActions> createState() => _QuickActionsState();
+}
+
+class _QuickActionsState extends State<QuickActions> {
   @override
   Widget build(BuildContext context) {
     return Column(
@@ -53,23 +58,93 @@ class QuickActions extends StatelessWidget {
       ],
     );
   }
+
+  void _showWriteNoteDialog(BuildContext context) {
+    final TextEditingController contentController = TextEditingController();
+    
+    showDialog(
+      context: context,
+      builder: (context) => AlertDialog(
+        title: const Text('Write Note'),
+        content: TextField(
+          controller: contentController,
+          maxLines: 5,
+          decoration: const InputDecoration(
+            hintText: 'What\'s on your mind?',
+            border: OutlineInputBorder(),
+          ),
+        ),
+        actions: [
+          TextButton(
+            onPressed: () => Navigator.of(context).pop(),
+            child: const Text('Cancel'),
+          ),
+          ElevatedButton(
+            onPressed: () {
+              if (contentController.text.trim().isNotEmpty) {
+                Navigator.of(context).pop();
+                _publishNote(context, contentController.text.trim());
+              }
+            },
+            style: ElevatedButton.styleFrom(
+              backgroundColor: Colors.orange,
+              foregroundColor: Colors.white,
+            ),
+            child: const Text('Publish'),
+          ),
+        ],
+      ),
+    );
+  }
+
+  void _publishNote(BuildContext context, String content) {
+    ScaffoldMessenger.of(context).showSnackBar(
+      SnackBar(
+        content: Text('Publishing note: ${content.substring(0, content.length > 50 ? 50 : content.length)}...'),
+        backgroundColor: Colors.orange,
+        action: SnackBarAction(
+          label: 'View',
+          textColor: Colors.white,
+          onPressed: () {
+            _navigateToPublishedNote(context, content);
+          },
+        ),
+      ),
+    );
+  }
+
+  void _navigateToPublishedNote(BuildContext context, String content) {
+    // Navigate to the published note in the feed
+    ScaffoldMessenger.of(context).showSnackBar(
+      SnackBar(
+        content: Text('Viewing published note: ${content.substring(0, content.length > 30 ? 30 : content.length)}...'),
+        backgroundColor: Colors.orange,
+      ),
+    );
+  }
 }
 
-class _ActionButton extends StatelessWidget {
+class _ActionButton extends StatefulWidget {
   final IconData icon;
   final String label;
   final VoidCallback onTap;
 
   const _ActionButton({
+    super.key,
     required this.icon,
     required this.label,
     required this.onTap,
   });
 
   @override
+  State<_ActionButton> createState() => _ActionButtonState();
+}
+
+class _ActionButtonState extends State<_ActionButton> {
+  @override
   Widget build(BuildContext context) {
     return InkWell(
-      onTap: onTap,
+      onTap: widget.onTap,
       borderRadius: BorderRadius.circular(8),
       child: Container(
         padding: const EdgeInsets.symmetric(vertical: 16, horizontal: 12),
@@ -80,13 +155,13 @@ class _ActionButton extends StatelessWidget {
         child: Column(
           children: [
             Icon(
-              icon,
+              widget.icon,
               size: 24,
               color: Colors.orange,
             ),
             const SizedBox(height: 8),
             Text(
-              label,
+              widget.label,
               style: const TextStyle(
                 fontSize: 12,
                 fontWeight: FontWeight.w500,
@@ -162,4 +237,5 @@ class _ActionButton extends StatelessWidget {
       ),
     );
   }
+
 }

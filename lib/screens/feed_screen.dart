@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:pull_to_refresh/pull_to_refresh.dart';
+import 'package:go_router/go_router.dart';
 import '../providers/app_providers.dart';
 import '../widgets/event_card.dart';
 import '../models/feed_event.dart';
@@ -14,6 +15,7 @@ class FeedScreen extends ConsumerStatefulWidget {
 
 class _FeedScreenState extends ConsumerState<FeedScreen> {
   final RefreshController _refreshController = RefreshController();
+  final RefreshController _loadController = RefreshController();
   final ScrollController _scrollController = ScrollController();
 
   @override
