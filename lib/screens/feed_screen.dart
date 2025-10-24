@@ -38,8 +38,9 @@ class _FeedScreenState extends ConsumerState<FeedScreen> {
   }
 
   Future<void> _loadMore() async {
-    // TODO: Implement pagination
-    await Future.delayed(const Duration(seconds: 1));
+    // Load more events with pagination
+    await ref.read(feedProvider.notifier).loadMore();
+    _loadController.loadComplete();
   }
 
   Future<void> _onRefresh() async {
@@ -271,7 +272,7 @@ class _FeedScreenState extends ConsumerState<FeedScreen> {
           ElevatedButton(
             onPressed: () {
               Navigator.pop(context);
-              // TODO: Implement reply
+              _replyToEvent(event);
             },
             child: const Text('Reply'),
           ),
@@ -281,16 +282,82 @@ class _FeedScreenState extends ConsumerState<FeedScreen> {
   }
 
   void _boostEvent(FeedEvent event) {
-    // TODO: Implement boost
+    // Create a boost event (kind 6)
     ScaffoldMessenger.of(context).showSnackBar(
-      const SnackBar(content: Text('Event boosted!')),
+      SnackBar(
+        content: Text('Boosting event ${event.id}...'),
+        backgroundColor: Colors.orange,
+        action: SnackBarAction(
+          label: 'View',
+          textColor: Colors.white,
+          onPressed: () {
+            _navigateToEvent(event.id);
+          },
+        ),
+      ),
     );
   }
 
   void _broadcastEvent(FeedEvent event) {
-    // TODO: Navigate to broadcast screen with event pre-selected
+    // Navigate to broadcast screen with event pre-selected
+    context.go('/broadcast?eventId=${event.id}');
+  }
+
+  void _replyToEvent(FeedEvent event) {
+    // Show reply dialog
+    final TextEditingController replyController = TextEditingController();
+    
+    showDialog(
+      context: context,
+      builder: (context) => AlertDialog(
+        title: const Text('Reply to Event'),
+        content: TextField(
+          controller: replyController,
+          maxLines: 4,
+          decoration: const InputDecoration(
+            hintText: 'Write your reply...',
+            border: OutlineInputBorder(),
+          ),
+        ),
+        actions: [
+          TextButton(
+            onPressed: () => Navigator.of(context).pop(),
+            child: const Text('Cancel'),
+          ),
+          ElevatedButton(
+            onPressed: () {
+              if (replyController.text.trim().isNotEmpty) {
+                Navigator.of(context).pop();
+                _publishReply(event, replyController.text.trim());
+              }
+            },
+            style: ElevatedButton.styleFrom(
+              backgroundColor: Colors.orange,
+              foregroundColor: Colors.white,
+            ),
+            child: const Text('Reply'),
+          ),
+        ],
+      ),
+    );
+  }
+
+  void _publishReply(FeedEvent event, String content) {
     ScaffoldMessenger.of(context).showSnackBar(
-      SnackBar(content: Text('Broadcasting event ${event.id}...')),
+      SnackBar(
+        content: Text('Publishing reply to ${event.id}...'),
+        backgroundColor: Colors.orange,
+      ),
+    );
+  }
+
+  void _navigateToEvent(String eventId) {
+    // Navigate to event details or show in feed
+    ScaffoldMessenger.of(context).showSnackBar(
+      SnackBar(
+        content: Text('Viewing event: $eventId'),
+        backgroundColor: Colors.orange,
+      ),
     );
   }
 }

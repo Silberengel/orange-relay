@@ -148,7 +148,7 @@ class EventCard extends StatelessWidget {
                   IconButton(
                     icon: const Icon(Icons.open_in_new),
                     onPressed: () {
-                      // TODO: Open external viewer
+                      _openExternalViewer(event.external_viewer_url!);
                     },
                     tooltip: 'Open in external viewer',
                   ),
@@ -156,6 +156,56 @@ class EventCard extends StatelessWidget {
             ),
           ],
         ),
+      ),
+    );
+  }
+
+  void _openExternalViewer(String url) {
+    // Open external viewer URL
+    showDialog(
+      context: context,
+      builder: (context) => AlertDialog(
+        title: const Text('External Viewer'),
+        content: Column(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            const Text('This would open the external viewer:'),
+            const SizedBox(height: 8),
+            SelectableText(
+              url,
+              style: const TextStyle(fontFamily: 'monospace'),
+            ),
+          ],
+        ),
+        actions: [
+          TextButton(
+            onPressed: () => Navigator.of(context).pop(),
+            child: const Text('Close'),
+          ),
+          ElevatedButton(
+            onPressed: () {
+              Navigator.of(context).pop();
+              _launchUrl(url);
+            },
+            style: ElevatedButton.styleFrom(
+              backgroundColor: Colors.orange,
+              foregroundColor: Colors.white,
+            ),
+            child: const Text('Open'),
+          ),
+        ],
+      ),
+    );
+  }
+
+  void _launchUrl(String url) {
+    // In a real implementation, this would use url_launcher
+    // For now, show a success message
+    ScaffoldMessenger.of(context).showSnackBar(
+      SnackBar(
+        content: Text('Opening external viewer: $url'),
+        backgroundColor: Colors.orange,
+        duration: const Duration(seconds: 3),
       ),
     );
   }

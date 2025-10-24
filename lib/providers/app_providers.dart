@@ -10,6 +10,11 @@ final feedProvider = StateNotifierProvider<FeedNotifier, AsyncValue<List<FeedEve
   return FeedNotifier();
 });
 
+// Books provider
+final booksProvider = StateNotifierProvider<BooksNotifier, AsyncValue<List<BookStructure>>>((ref) {
+  return BooksNotifier();
+});
+
 class FeedNotifier extends StateNotifier<AsyncValue<List<FeedEvent>>> {
   FeedNotifier() : super(const AsyncValue.loading()) {
     loadFeed();
@@ -112,6 +117,37 @@ class SettingsNotifier extends StateNotifier<Map<String, dynamic>> {
 }
 
 // Router provider
+class BooksNotifier extends StateNotifier<AsyncValue<List<BookStructure>>> {
+  BooksNotifier() : super(const AsyncValue.loading());
+
+  Future<void> loadBooks() async {
+    state = const AsyncValue.loading();
+    try {
+      // Load books from Rust backend
+      // For now, return sample data with realistic book structures
+      await Future.delayed(const Duration(seconds: 1));
+      final books = List.generate(10, (index) => BookStructure(
+        id: 'book-$index',
+        title: 'Sample Book ${index + 1}',
+        author: 'Author ${index + 1}',
+        description: 'This is a sample book description for book ${index + 1}.',
+        coverUrl: null,
+        chapters: [],
+        totalChapters: 0,
+        currentChapter: 0,
+        readingProgress: 0.0,
+      ));
+      state = AsyncValue.data(books);
+    } catch (e, stackTrace) {
+      state = AsyncValue.error(e, stackTrace);
+    }
+  }
+
+  Future<void> refresh() async {
+    await loadBooks();
+  }
+}
+
 final routerProvider = Provider<GoRouter>((ref) {
   return GoRouter(
     initialLocation: '/',

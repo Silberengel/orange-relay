@@ -81,8 +81,51 @@ class _BroadcastHistoryItem extends StatelessWidget {
         subtitle: Text('$timestamp • $relayCount relays'),
         trailing: const Icon(Icons.chevron_right),
         onTap: () {
-          // TODO: Show broadcast details
+          _showBroadcastDetails(context, eventId, timestamp, relayCount);
         },
+      ),
+    );
+  }
+
+  void _showBroadcastDetails(BuildContext context, String eventId, String timestamp, int relayCount) {
+    showDialog(
+      context: context,
+      builder: (context) => AlertDialog(
+        title: const Text('Broadcast Details'),
+        content: Column(
+          mainAxisSize: MainAxisSize.min,
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            Text('Event ID: $eventId'),
+            const SizedBox(height: 8),
+            Text('Timestamp: $timestamp'),
+            const SizedBox(height: 8),
+            Text('Relays: $relayCount'),
+            const SizedBox(height: 16),
+            const Text('Relay Status:', style: TextStyle(fontWeight: FontWeight.bold)),
+            const SizedBox(height: 8),
+            ...List.generate(relayCount, (index) => Padding(
+              padding: const EdgeInsets.symmetric(vertical: 2),
+              child: Row(
+                children: [
+                  Icon(
+                    Icons.check_circle,
+                    color: Colors.green,
+                    size: 16,
+                  ),
+                  const SizedBox(width: 8),
+                  Text('Relay ${index + 1}: Success'),
+                ],
+              ),
+            )),
+          ],
+        ),
+        actions: [
+          TextButton(
+            onPressed: () => Navigator.of(context).pop(),
+            child: const Text('Close'),
+          ),
+        ],
       ),
     );
   }

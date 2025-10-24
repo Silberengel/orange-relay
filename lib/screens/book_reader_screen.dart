@@ -61,7 +61,7 @@ class _BookReaderScreenState extends ConsumerState<BookReaderScreen> {
         book: ref.read(bookProvider(widget.bookId).notifier).state.value,
         onChapterSelected: (chapter) {
           Navigator.pop(context);
-          // TODO: Navigate to chapter
+          _navigateToChapter(chapter);
         },
       ),
     );
@@ -176,7 +176,7 @@ class _BookReaderScreenState extends ConsumerState<BookReaderScreen> {
                           icon: const Icon(Icons.chevron_left),
                           onPressed: book.current_chapter > 0
                               ? () {
-                                  // TODO: Go to previous chapter
+                                  _goToPreviousChapter();
                                 }
                               : null,
                         ),
@@ -188,7 +188,7 @@ class _BookReaderScreenState extends ConsumerState<BookReaderScreen> {
                           icon: const Icon(Icons.chevron_right),
                           onPressed: book.current_chapter < book.total_chapters - 1
                               ? () {
-                                  // TODO: Go to next chapter
+                                  _goToNextChapter();
                                 }
                               : null,
                         ),
@@ -244,5 +244,26 @@ class _BookReaderScreenState extends ConsumerState<BookReaderScreen> {
         child: const Icon(Icons.menu),
       ),
     );
+  }
+
+  void _navigateToChapter(Chapter chapter) {
+    // Update the current chapter in the book
+    ref.read(bookProvider(widget.bookId).notifier).setCurrentChapter(chapter.index);
+  }
+
+  void _goToPreviousChapter() {
+    final book = ref.read(bookProvider(widget.bookId).notifier).state.value;
+    if (book.current_chapter > 0) {
+      final previousChapter = book.chapters[book.current_chapter - 1];
+      _navigateToChapter(previousChapter);
+    }
+  }
+
+  void _goToNextChapter() {
+    final book = ref.read(bookProvider(widget.bookId).notifier).state.value;
+    if (book.current_chapter < book.total_chapters - 1) {
+      final nextChapter = book.chapters[book.current_chapter + 1];
+      _navigateToChapter(nextChapter);
+    }
   }
 }

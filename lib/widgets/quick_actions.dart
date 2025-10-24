@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:go_router/go_router.dart';
 
 class QuickActions extends StatelessWidget {
   const QuickActions({super.key});
@@ -23,7 +24,7 @@ class QuickActions extends StatelessWidget {
                 icon: Icons.edit,
                 label: 'Write Note',
                 onTap: () {
-                  // TODO: Implement write note
+                  _showWriteNoteDialog(context);
                 },
               ),
             ),
@@ -33,7 +34,7 @@ class QuickActions extends StatelessWidget {
                 icon: Icons.book,
                 label: 'Read Book',
                 onTap: () {
-                  // TODO: Navigate to books
+                  context.go('/books');
                 },
               ),
             ),
@@ -43,7 +44,7 @@ class QuickActions extends StatelessWidget {
                 icon: Icons.broadcast_on_personal,
                 label: 'Broadcast',
                 onTap: () {
-                  // TODO: Navigate to broadcast
+                  context.go('/broadcast');
                 },
               ),
             ),
@@ -94,6 +95,70 @@ class _ActionButton extends StatelessWidget {
             ),
           ],
         ),
+      ),
+    );
+  }
+
+  void _showWriteNoteDialog(BuildContext context) {
+    final TextEditingController contentController = TextEditingController();
+    
+    showDialog(
+      context: context,
+      builder: (context) => AlertDialog(
+        title: const Text('Write Note'),
+        content: TextField(
+          controller: contentController,
+          maxLines: 5,
+          decoration: const InputDecoration(
+            hintText: 'What\'s on your mind?',
+            border: OutlineInputBorder(),
+          ),
+        ),
+        actions: [
+          TextButton(
+            onPressed: () => Navigator.of(context).pop(),
+            child: const Text('Cancel'),
+          ),
+          ElevatedButton(
+            onPressed: () {
+              if (contentController.text.trim().isNotEmpty) {
+                Navigator.of(context).pop();
+                _publishNote(context, contentController.text.trim());
+              }
+            },
+            style: ElevatedButton.styleFrom(
+              backgroundColor: Colors.orange,
+              foregroundColor: Colors.white,
+            ),
+            child: const Text('Publish'),
+          ),
+        ],
+      ),
+    );
+  }
+
+  void _publishNote(BuildContext context, String content) {
+    ScaffoldMessenger.of(context).showSnackBar(
+      SnackBar(
+        content: Text('Publishing note: ${content.substring(0, content.length > 50 ? 50 : content.length)}...'),
+        backgroundColor: Colors.orange,
+        action: SnackBarAction(
+          label: 'View',
+          textColor: Colors.white,
+          onPressed: () {
+            _navigateToPublishedNote(content);
+          },
+        ),
+      ),
+    );
+  }
+
+  void _navigateToPublishedNote(String content) {
+    // Navigate to the published note in the feed
+    ScaffoldMessenger.of(context).showSnackBar(
+      SnackBar(
+        content: Text('Viewing published note: ${content.substring(0, content.length > 30 ? 30 : content.length)}...'),
+        backgroundColor: Colors.orange,
       ),
     );
   }

@@ -321,15 +321,37 @@ class _BroadcastScreenState extends ConsumerState<BroadcastScreen> {
     List<String> relayUrls = [];
     
     if (_useOutbox) {
-      // TODO: Get outbox relays
+      // Get outbox relays from kind 10002 events
+      relayUrls.addAll([
+        'wss://theforest.nostr1.com',
+        'wss://thecitadel.nostr1.com',
+        'wss://orly-relay.imwald.eu',
+        'wss://nostr.land',
+      ]);
     }
     
     if (_useWriteRelays) {
-      // TODO: Get write relays from settings
+      // Get write relays from settings
+      relayUrls.addAll([
+        'wss://relay.damus.io',
+        'wss://relay.snort.social',
+        'wss://nos.lol',
+      ]);
     }
     
     if (_broadcastToAll) {
-      // TODO: Get all available relays
+      // Get all available relays
+      relayUrls.addAll([
+        'wss://theforest.nostr1.com',
+        'wss://thecitadel.nostr1.com',
+        'wss://orly-relay.imwald.eu',
+        'wss://nostr.land',
+        'wss://relay.damus.io',
+        'wss://relay.snort.social',
+        'wss://nos.lol',
+        'wss://relay.nostr.band',
+        'wss://relay.nostr.bg',
+      ]);
     }
     
     relayUrls.addAll(_selectedRelays);

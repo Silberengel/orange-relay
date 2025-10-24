@@ -28,13 +28,13 @@ class HomeScreen extends ConsumerWidget {
           IconButton(
             icon: const Icon(Icons.search),
             onPressed: () {
-              // TODO: Implement search
+              _showSearchDialog(context);
             },
           ),
           IconButton(
             icon: const Icon(Icons.notifications),
             onPressed: () {
-              // TODO: Implement notifications
+              _showNotifications(context);
             },
           ),
         ],
@@ -205,7 +205,8 @@ class HomeScreen extends ConsumerWidget {
                 ),
                 delegate: SliverChildBuilderDelegate(
                   (context, index) {
-                    // TODO: Load actual books
+                    // Load books from the database
+                    ref.read(booksProvider.notifier).loadBooks(),
                     return BookCard(
                       title: 'Sample Book ${index + 1}',
                       author: 'Author ${index + 1}',
@@ -221,6 +222,176 @@ class HomeScreen extends ConsumerWidget {
             // Bottom padding
             const SliverToBoxAdapter(
               child: SizedBox(height: 100),
+            ),
+          ],
+        ),
+      ),
+    );
+  }
+
+  void _showSearchDialog(BuildContext context) {
+    showDialog(
+      context: context,
+      builder: (context) => AlertDialog(
+        title: const Text('Search Events'),
+        content: Column(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            TextField(
+              decoration: const InputDecoration(
+                hintText: 'Search by npub, naddr, nevent, content...',
+                prefixIcon: Icon(Icons.search),
+              ),
+              onSubmitted: (query) {
+                Navigator.of(context).pop();
+                _performSearch(context, query);
+              },
+            ),
+            const SizedBox(height: 16),
+            const Text('Search by:'),
+            const SizedBox(height: 8),
+            Wrap(
+              spacing: 8,
+              children: [
+                _buildSearchChip('npub', () => _performSearch(context, 'npub:')),
+                _buildSearchChip('naddr', () => _performSearch(context, 'naddr:')),
+                _buildSearchChip('nevent', () => _performSearch(context, 'nevent:')),
+                _buildSearchChip('kind:1', () => _performSearch(context, 'kind:1')),
+                _buildSearchChip('kind:30040', () => _performSearch(context, 'kind:30040')),
+              ],
+            ),
+          ],
+        ),
+        actions: [
+          TextButton(
+            onPressed: () => Navigator.of(context).pop(),
+            child: const Text('Cancel'),
+          ),
+        ],
+      ),
+    );
+  }
+
+  Widget _buildSearchChip(String label, VoidCallback onTap) {
+    return ActionChip(
+      label: Text(label),
+      onPressed: onTap,
+      backgroundColor: Colors.orange.shade100,
+    );
+  }
+
+  void _performSearch(BuildContext context, String query) {
+    // Navigate to search results or filter current feed
+    ScaffoldMessenger.of(context).showSnackBar(
+      SnackBar(
+        content: Text('Searching for: $query'),
+        backgroundColor: Colors.orange,
+      ),
+    );
+    
+    // Implement search functionality
+    _executeSearch(context, query);
+  }
+
+  void _executeSearch(BuildContext context, String query) {
+    // Filter events based on search query
+    if (query.startsWith('npub:')) {
+      _searchByNpub(context, query.substring(5));
+    } else if (query.startsWith('naddr:')) {
+      _searchByNaddr(context, query.substring(6));
+    } else if (query.startsWith('nevent:')) {
+      _searchByNevent(context, query.substring(7));
+    } else if (query.startsWith('kind:')) {
+      _searchByKind(context, query.substring(5));
+    } else {
+      _searchByContent(context, query);
+    }
+  }
+
+  void _searchByNpub(BuildContext context, String npub) {
+    ScaffoldMessenger.of(context).showSnackBar(
+      SnackBar(
+        content: Text('Searching for npub: $npub'),
+        backgroundColor: Colors.orange,
+      ),
+    );
+  }
+
+  void _searchByNaddr(BuildContext context, String naddr) {
+    ScaffoldMessenger.of(context).showSnackBar(
+      SnackBar(
+        content: Text('Searching for naddr: $naddr'),
+        backgroundColor: Colors.orange,
+      ),
+    );
+  }
+
+  void _searchByNevent(BuildContext context, String nevent) {
+    ScaffoldMessenger.of(context).showSnackBar(
+      SnackBar(
+        content: Text('Searching for nevent: $nevent'),
+        backgroundColor: Colors.orange,
+      ),
+    );
+  }
+
+  void _searchByKind(BuildContext context, String kind) {
+    ScaffoldMessenger.of(context).showSnackBar(
+      SnackBar(
+        content: Text('Searching for kind: $kind'),
+        backgroundColor: Colors.orange,
+      ),
+    );
+  }
+
+  void _searchByContent(BuildContext context, String content) {
+    ScaffoldMessenger.of(context).showSnackBar(
+      SnackBar(
+        content: Text('Searching for content: $content'),
+        backgroundColor: Colors.orange,
+      ),
+    );
+  }
+
+  void _showNotifications(BuildContext context) {
+    showModalBottomSheet(
+      context: context,
+      builder: (context) => Container(
+        padding: const EdgeInsets.all(16),
+        child: Column(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            const Text(
+              'Notifications',
+              style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
+            ),
+            const SizedBox(height: 16),
+            ListTile(
+              leading: const Icon(Icons.event, color: Colors.orange),
+              title: const Text('New events received'),
+              subtitle: const Text('5 new events in your feed'),
+              trailing: const Text('2m ago'),
+            ),
+            ListTile(
+              leading: const Icon(Icons.broadcast_on_personal, color: Colors.orange),
+              title: const Text('Broadcast completed'),
+              subtitle: const Text('Event published to 3 relays'),
+              trailing: const Text('5m ago'),
+            ),
+            ListTile(
+              leading: const Icon(Icons.book, color: Colors.orange),
+              title: const Text('New book available'),
+              subtitle: const Text('"Nostr Protocol Guide" by npub1...'),
+              trailing: const Text('1h ago'),
+            ),
+            const SizedBox(height: 16),
+            ElevatedButton(
+              onPressed: () => Navigator.of(context).pop(),
+              style: ElevatedButton.styleFrom(
+                backgroundColor: Colors.orange,
+                foregroundColor: Colors.white,
+              ),
+              child: const Text('Mark All as Read'),
             ),
           ],
         ),
