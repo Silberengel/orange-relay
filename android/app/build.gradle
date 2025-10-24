@@ -6,8 +6,8 @@ plugins {
 }
 
 android {
-    namespace = "com.gitcitadel.alexnative.alex_native_mobile"
-    compileSdk = flutter.compileSdkVersion
+    namespace = "com.gitcitadel.orange_relay"
+    compileSdk = 35
     ndkVersion = flutter.ndkVersion
 
     compileOptions {
@@ -21,7 +21,7 @@ android {
 
     defaultConfig {
         // TODO: Specify your own unique Application ID (https://developer.android.com/studio/build/application-id.html).
-        applicationId = "com.gitcitadel.alexnative.alex_native_mobile"
+        applicationId = "com.gitcitadel.orange_relay"
         // You can update the following values to match your application needs.
         // For more information, see: https://flutter.dev/to/review-gradle-config.
         minSdk = flutter.minSdkVersion

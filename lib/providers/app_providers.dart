@@ -145,9 +145,13 @@ class SettingsNotifier extends StateNotifier<Map<String, dynamic>> {
 
 // Router provider
 class BooksNotifier extends StateNotifier<AsyncValue<List<BookStructure>>> {
-  BooksNotifier() : super(const AsyncValue.loading());
+  BooksNotifier() : super(const AsyncValue.loading()) {
+    loadBooks();
+  }
 
   Future<void> loadBooks() async {
+    if (state.isLoading) return; // Prevent multiple simultaneous loads
+    
     state = const AsyncValue.loading();
     try {
       // Load books from Rust backend
@@ -175,11 +179,3 @@ class BooksNotifier extends StateNotifier<AsyncValue<List<BookStructure>>> {
 }
 
 
-final routerProvider = Provider<GoRouter>((ref) {
-  return GoRouter(
-    initialLocation: '/',
-    routes: [
-      // Routes will be defined in main.dart
-    ],
-  );
-});

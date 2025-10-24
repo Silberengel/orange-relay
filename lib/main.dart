@@ -17,9 +17,14 @@ import 'theme/app_theme.dart';
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
   
-  // Initialize services
-  await RustService.initialize();
-  await NotificationService.initialize();
+  try {
+    // Initialize services with error handling
+    await RustService.initialize();
+    await NotificationService.initialize();
+  } catch (e) {
+    print('Service initialization error: $e');
+    // Continue anyway for now
+  }
   
   runApp(
     const ProviderScope(
