@@ -1,0 +1,122 @@
+import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:go_router/go_router.dart';
+import '../services/rust_service.dart';
+import '../models/feed_event.dart';
+import '../models/book_structure.dart';
+import '../models/broadcast_response.dart';
+
+// Feed provider
+final feedProvider = StateNotifierProvider<FeedNotifier, AsyncValue<List<FeedEvent>>>((ref) {
+  return FeedNotifier();
+});
+
+class FeedNotifier extends StateNotifier<AsyncValue<List<FeedEvent>>> {
+  FeedNotifier() : super(const AsyncValue.loading()) {
+    loadFeed();
+  }
+
+  Future<void> loadFeed({int limit = 100}) async {
+    state = const AsyncValue.loading();
+    try {
+      final events = await RustService.getFeedEvents(limit: limit);
+      final feedEvents = events.map((json) => FeedEvent.fromJson(json)).toList();
+      state = AsyncValue.data(feedEvents);
+    } catch (e) {
+      state = AsyncValue.error(e, StackTrace.current);
+    }
+  }
+
+  Future<void> refresh() async {
+    await loadFeed();
+  }
+}
+
+// Book provider
+final bookProvider = StateNotifierProvider.family<BookNotifier, AsyncValue<BookStructure?>, String>((ref, bookId) {
+  return BookNotifier(bookId);
+});
+
+class BookNotifier extends StateNotifier<AsyncValue<BookStructure?>> {
+  final String bookId;
+  
+  BookNotifier(this.bookId) : super(const AsyncValue.loading()) {
+    loadBook();
+  }
+
+  Future<void> loadBook() async {
+    state = const AsyncValue.loading();
+    try {
+      final bookData = await RustService.getBookStructure(bookId);
+      if (bookData != null) {
+        final book = BookStructure.fromJson(bookData);
+        state = AsyncValue.data(book);
+      } else {
+        state = const AsyncValue.data(null);
+      }
+    } catch (e) {
+      state = AsyncValue.error(e, StackTrace.current);
+    }
+  }
+}
+
+// Broadcast provider
+final broadcastProvider = StateNotifierProvider<BroadcastNotifier, AsyncValue<BroadcastResponse?>>((ref) {
+  return BroadcastNotifier();
+});
+
+class BroadcastNotifier extends StateNotifier<AsyncValue<BroadcastResponse?>> {
+  BroadcastNotifier() : super(const AsyncValue.data(null));
+
+  Future<void> broadcastEvent(String eventId, List<String> relayUrls) async {
+    state = const AsyncValue.loading();
+    try {
+      final response = await RustService.broadcastEvent(eventId, relayUrls);
+      final broadcastResponse = BroadcastResponse.fromJson(response);
+      state = AsyncValue.data(broadcastResponse);
+    } catch (e) {
+      state = AsyncValue.error(e, StackTrace.current);
+    }
+  }
+
+  void clearResponse() {
+    state = const AsyncValue.data(null);
+  }
+}
+
+// Relay stats provider
+final relayStatsProvider = FutureProvider<Map<String, dynamic>>((ref) async {
+  return await RustService.getRelayStats();
+});
+
+// Settings provider
+final settingsProvider = StateNotifierProvider<SettingsNotifier, Map<String, dynamic>>((ref) {
+  return SettingsNotifier();
+});
+
+class SettingsNotifier extends StateNotifier<Map<String, dynamic>> {
+  SettingsNotifier() : super({
+    'theme': 'system',
+    'notifications': true,
+    'biometric_auth': false,
+    'auto_broadcast': false,
+    'default_relays': <String>[],
+  });
+
+  void updateSetting(String key, dynamic value) {
+    state = {...state, key: value};
+  }
+
+  void updateSettings(Map<String, dynamic> newSettings) {
+    state = {...state, ...newSettings};
+  }
+}
+
+// Router provider
+final routerProvider = Provider<GoRouter>((ref) {
+  return GoRouter(
+    initialLocation: '/',
+    routes: [
+      // Routes will be defined in main.dart
+    ],
+  );
+});
